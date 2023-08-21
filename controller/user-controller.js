@@ -1,7 +1,7 @@
 const User = require('../models/User');
 
 // Define  controller functions here
-const User = require('../models/User');
+
 const Thought = require('../models/Thought');
 
 const userController = {

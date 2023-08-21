@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 27017;
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost/your-database-name', {
+mongoose.connect('mongodb://localhost/social-network', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });

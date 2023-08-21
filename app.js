@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const app = express();
-const PORT = process.env.PORT || 27017;
+const PORT = process.env.PORT || 3001;
 
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost/social-network', {
@@ -12,8 +12,8 @@ mongoose.connect('mongodb://localhost/social-network', {
 
 // Set up body parser and routes
 app.use(express.json());
-app.use('/api/users', require('./api/users'));
-app.use('/api/thoughts', require('./api/thoughts'));
+app.use('/api/users', require('./controller/api/users'));
+app.use('/api/thoughts', require('./controller/api/thoughts'));
 
 // Start the server
 app.listen(PORT, () => {

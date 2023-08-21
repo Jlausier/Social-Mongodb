@@ -1,8 +1,6 @@
 const Thought = require('../models/Thought');
 
 // Define  controller functions here
-const Thought = require('../models/Thought');
-
 const thoughtController = {
   getAllThoughts: async (req, res) => {
     try {
@@ -52,3 +50,46 @@ const thoughtController = {
       res.status(400).json({ message: 'Invalid thought data.' });
     }
   },
+
+  deleteThought: async (req, res) => {
+    try {
+      const thought = await Thought.findByIdAndDelete(req.params.thoughtId);
+      if (!thought) {
+        return res.status(404).json({ message: 'Thought not found.' });
+      }
+      res.json({ message: 'Thought deleted successfully.' });
+    } catch (error) {
+      res.status(500).json({ message: 'An error occurred while deleting the thought.' });
+    }
+  },
+
+  createReaction: async (req, res) => {
+    try {
+      const thought = await Thought.findById(req.params.thoughtId);
+      if (!thought) {
+        return res.status(404).json({ message: 'Thought not found.' });
+      }
+      thought.reactions.push(req.body);
+      await thought.save();
+      res.json(thought);
+    } catch (error) {
+      res.status(500).json({ message: 'An error occurred while creating a reaction.' });
+    }
+  },
+
+  deleteReaction: async (req, res) => {
+    try {
+      const thought = await Thought.findById(req.params.thoughtId);
+      if (!thought) {
+        return res.status(404).json({ message: 'Thought not found.' });
+      }
+      thought.reactions.pull({ reactionId: req.params.reactionId });
+      await thought.save();
+      res.json(thought);
+    } catch (error) {
+      res.status(500).json({ message: 'An error occurred while deleting a reaction.' });
+    }
+  }
+};
+
+module.exports = thoughtController;

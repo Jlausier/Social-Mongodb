@@ -88,7 +88,7 @@ const userController = {
       if (!user) {
         return res.status(404).json({ message: 'User not found.' });
       }
-      user.friends.pull(req.params.friendId);
+      user.friends.pull(friend);
       await user.save();
       res.json(user);
     } catch (error) {

@@ -4,13 +4,15 @@ module.exports = {
         username: 'user1',
         email: 'user1@example.com',
         thoughts: [],
-        friends: []
+        friends: [],
+        friendId: "1"
       },
       {
         username: 'user2',
         email: 'user2@example.com',
         thoughts: [],
-        friends: []
+        friends: [],
+        friendId: "2"
       }
     ],
     thoughts: [

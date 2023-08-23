@@ -27,9 +27,7 @@ const thoughtController = {
     try {
       const { thoughtText, username, userId } = req.body;
       const thought = await Thought.create({ thoughtText, username });
-      const user = await User.findById(userId);
-      user.thoughts.push(thought);
-      await user.save();
+      
       res.json(thought);
     } catch (error) {
       res.status(400).json({ message: 'Invalid thought data.' });
@@ -85,7 +83,7 @@ const thoughtController = {
       }
       thought.reactions.pull({ reactionId: req.params.reactionId });
       await thought.save();
-      res.json(thought);
+      res.json({messsage: 'Succefully deleted reaction'});
     } catch (error) {
       res.status(500).json({ message: 'An error occurred while deleting a reaction.' });
     }

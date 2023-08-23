@@ -1,49 +1,38 @@
-const mongoose = require("mongoose");
+
+const connection = require('../config/connection');
 const User = require("../models/User");
 const Thought = require("../models/Thought");
+const Reaction = require("../models/Reaction")
 const data = require("./data");
 
-mongoose.connect("mongodb://localhost/social-netwrok", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
 
-// Sample user data
-// const users = [
-//   {
-//     username: 'user1',
-//     email: 'user1@example.com'
-//   },
-//   {
-//     username: 'user2',
-//     email: 'user2@example.com'
-//   }
-// ];
+connection.on('error', (err) => err);
 
-// Sample thought data
-// const thoughts = [
-//   {
-//     thoughtText: 'This is a sample thought by user1',
-//     username: 'user1'
-//   },
-//   {
-//     thoughtText: 'Another thought by user1',
-//     username: 'user1'
-//   },
-//   {
-//     thoughtText: 'A thought by user2',
-//     username: 'user2'
-//   }
-// ];
-
-async function seedDatabase() {
+connection.once('open', async () => {
   try {
-    // await User.deleteMany();
-    // await Thought.deleteMany();
+  
+  // Delete the collections if they exist
+  let userCheck = await connection.db.listCollections({ name: 'User' }).toArray();
+  if (userCheck.length) {
+    await connection.dropCollection('users');
+  }
 
-    const createdUsers = await User.insertMany(data.users);
+  let thoughtCheck = await connection.db.listCollections({ name: 'thought' }).toArray();
+  if (thoughtCheck.length) {
+    await connection.dropCollection('thoughts');
+  }
+  let reactionCheck = await connection.db.listCollections({ name: 'reaction' }).toArray();
+  if (reactionCheck.length) {
+    await connection.dropCollection('reaction');
+  }
+    const createdUsers = await User.collection.insertMany(data.users);
     console.log("Users seeded:", createdUsers);
 
+    const createdThoughts = await Thought.collection.insertMany(data.thoughts);
+    console.log("Thoughts seeded:", createdThoughts);
+
+    const createdReactions = await Reaction.collection.insertMany(data.reactions);
+    console.log("Reactions seeded:", createdReactions);
     // data.thoughts.forEach(async (thought) => {
     //   const user = createdUsers.find(u => u.username === thought.username);
     //   const createdThought = await Thought.create({ ...thought, userId: user._id });
@@ -52,11 +41,12 @@ async function seedDatabase() {
     //   console.log(`Thought ${index + 1} seeded:`, createdThought);
     // });
 
-    mongoose.connection.close();
+    
     console.log("Database seeding complete.");
   } catch (error) {
     console.error("Error seeding database:", error);
   }
-}
-mongoose.connection.once('open', () => {
-seedDatabase()});
+  process.exit(0);
+})
+
+

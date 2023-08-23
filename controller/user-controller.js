@@ -1,30 +1,34 @@
-const User = require('../models/User');
+const User = require("../models/User");
 
 // Define  controller functions here
 
-const Thought = require('../models/Thought');
+const Thought = require("../models/Thought");
 
 const userController = {
   getAllUsers: async (req, res) => {
     try {
-      const users = await User.find().populate('thoughts').populate('friends');
+      const users = await User.find().populate("thoughts").populate("friends");
       res.json(users);
     } catch (error) {
-      res.status(500).json({ message: 'An error occurred while fetching users.' });
+      res
+        .status(500)
+        .json({ message: "An error occurred while fetching users." });
     }
   },
 
   getUserById: async (req, res) => {
     try {
       const user = await User.findById(req.params.userId)
-        .populate('thoughts')
-        .populate('friends');
+        .populate("thoughts")
+        .populate("friends");
       if (!user) {
-        return res.status(404).json({ message: 'User not found.' });
+        return res.status(404).json({ message: "User not found." });
       }
       res.json(user);
     } catch (error) {
-      res.status(500).json({ message: 'An error occurred while fetching the user.' });
+      res
+        .status(500)
+        .json({ message: "An error occurred while fetching the user." });
     }
   },
 
@@ -34,22 +38,22 @@ const userController = {
       const user = await User.create({ username, email });
       res.json(user);
     } catch (error) {
-      res.status(400).json({ message: 'Invalid user data.' });
+      res.status(400).json({ message: "Invalid user data." });
     }
   },
-  
+
   updateUser: async (req, res) => {
     try {
       const user = await User.findByIdAndUpdate(req.params.userId, req.body, {
         new: true,
-        runValidators: true
+        runValidators: true,
       });
       if (!user) {
-        return res.status(404).json({ message: 'User not found.' });
+        return res.status(404).json({ message: "User not found." });
       }
       res.json(user);
     } catch (error) {
-      res.status(400).json({ message: 'Invalid user data.' });
+      res.status(400).json({ message: "Invalid user data." });
     }
   },
 
@@ -57,44 +61,53 @@ const userController = {
     try {
       const user = await User.findByIdAndDelete(req.params.userId);
       if (!user) {
-        return res.status(404).json({ message: 'User not found.' });
+        return res.status(404).json({ message: "User not found." });
       }
       // Remove associated thoughts
       await Thought.deleteMany({ username: user.username });
-      res.json({ message: 'User deleted successfully.' });
+      res.json({ message: "User deleted successfully." });
     } catch (error) {
-      res.status(500).json({ message: 'An error occurred while deleting the user.' });
+      res
+        .status(500)
+        .json({ message: "An error occurred while deleting the user." });
     }
   },
 
   addFriend: async (req, res) => {
     try {
-      const user = await User.findById(req.params.userId);
-      const friend = await User.findById(req.params.friendId);
-      if (!user || !friend) {
-        return res.status(404).json({ message: 'User or friend not found.' });
+      const user = await User.findOneAndUpdate(
+        { _id: req.params.userId },
+        { $addToSet: { friends: req.params.friendId } },
+        { new: true }
+      );
+      if (!user) {
+        return res.status(404).json({ message: "User not found." });
       }
-      user.friends.push(friend);
-      await user.save();
       res.json(user);
     } catch (error) {
-      res.status(500).json({ message: 'An error occurred while adding a friend.' });
+      res
+        .status(500)
+        .json({ message: "An error occurred while adding a friend." });
     }
   },
 
   removeFriend: async (req, res) => {
     try {
-      const user = await User.findById(req.params.userId);
+      const user = await User.findOneAndUpdate(
+        { _id: req.params.userId },
+        { $pull: { friends: req.params.friendId } },
+        { new: true }
+      );
       if (!user) {
-        return res.status(404).json({ message: 'User not found.' });
+        return res.status(404).json({ message: "User not found." });
       }
-      user.friends.pull(friend);
-      await user.save();
       res.json(user);
     } catch (error) {
-      res.status(500).json({ message: 'An error occurred while removing a friend.' });
+      res
+        .status(500)
+        .json({ message: "An error occurred while removing a friend." });
     }
-  }
+  },
 };
 
 module.exports = userController;
